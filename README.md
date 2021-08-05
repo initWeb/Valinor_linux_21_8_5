@@ -322,7 +322,7 @@ ggle
 例：查两个o以上，过滤goo，因为o*可以是0次  
 grep "gooo*gle" f1   —>返回goooogle、google  
 例：grep "g.*gle" f1   任意字符任意匹配  
-- \? 匹配前面的字符0或1次  
+\\? 匹配前面的字符0或1次  
 例：grep "go\?gle" f1  —>返回gogle、ggle  
 \+ 匹配前面的字符至少1次  
 例：grep "go\+gle" f1  —>返回goooogle、google、gogle  
