@@ -1,74 +1,73 @@
-# Valinor_linux_21_8_5
-
-# 2021.8.5
-*---------------------------Linux指令学习-----------------------*
-Linux文本三剑客
+# Valinor_linux_21_8_5  
+# 2021.8.5  
+*---------------------------Linux指令学习-----------------------*  
+Linux文本三剑客  
 ## grep
 ## sed
 ## awk
-----------------grep(文本过滤工具)----------------
-`grep [options] pattern [files...]`
-作用:将模式中包含特定字符串的行过滤打印出来
-grep root /etc/passwd          把passwd中包含root的行打印出来
-grep -v root /etc/passwd      把passwd中不包含root的行打印出来
-例：查硬盘分区利用率并排序/查客户端ip
-df |grep /dev/sd |tr -s ' ' % |cut -d% -f5 |sort -nr
-ss -tn |grep ESTAB |tr -s ' ' : |cut -d: -f6 |sort -nr
-例：查当前登陆用户的字符串的行
-grep 'whoami' /etc/passwd     // 以whoami字符串作为搜索条件
-grep $USER /etc/passwd         // 以$USER变量作为搜索条件
-grep "$USER" /etc/passwd      // 识别变量
-grep '$USER' /etc/passwd       // 以$USER字符串作为搜索条件
-PS=''和""的区别：单引号会识别内容为字符串；双引号可以寻找变量
-例：显示字符串和前后三行
-grep -nA3 root /etc/passwd     // 前三行
-grep -nB3 root /etc/passwd     // 后三行
-grep -nC3 root /etc/passwd     // 前后三行
-例：显示多个字符串的并集行
-grep -e root -e wang /etc/passwd
-例：显示多个字符串的交集行
-grep root /etc/passwd |grep wang
-例：读取文件中的字符串，与之匹配并打印出行
-cat > xxx.txt
-```*****xxx.txt*****```
-```root```
-```ctrl+c```
-```*****xxx.txt*****```
-`grep -f xxx.txt /etc/passwd    // 实际上这也是取交集`
+----------------grep(文本过滤工具)----------------  
+`grep [options] pattern [files...]`  
+作用:将模式中包含特定字符串的行过滤打印出来  
+grep root /etc/passwd          把passwd中包含root的行打印出来  
+grep -v root /etc/passwd      把passwd中不包含root的行打印出来  
+例：查硬盘分区利用率并排序/查客户端ip  
+df |grep /dev/sd |tr -s ' ' % |cut -d% -f5 |sort -nr  
+ss -tn |grep ESTAB |tr -s ' ' : |cut -d: -f6 |sort -nr  
+例：查当前登陆用户的字符串的行  
+grep 'whoami' /etc/passwd     // 以whoami字符串作为搜索条件  
+grep $USER /etc/passwd         // 以$USER变量作为搜索条件  
+grep "$USER" /etc/passwd      // 识别变量  
+grep '$USER' /etc/passwd       // 以$USER字符串作为搜索条件  
+PS=''和""的区别：单引号会识别内容为字符串；双引号可以寻找变量  
+例：显示字符串和前后三行  
+grep -nA3 root /etc/passwd     // 前三行  
+grep -nB3 root /etc/passwd     // 后三行  
+grep -nC3 root /etc/passwd     // 前后三行  
+例：显示多个字符串的并集行  
+grep -e root -e wang /etc/passwd  
+例：显示多个字符串的交集行  
+grep root /etc/passwd |grep wang  
+例：读取文件中的字符串，与之匹配并打印出行  
+```cat > xxx.txt```  
+```*****xxx.txt*****```  
+```root```  
+```ctrl+c```  
+```*****xxx.txt*****```  
+`grep -f xxx.txt /etc/passwd    // 实际上这也是取交集`  
 
----------------------------------------------------------------
-glob 通配符 对文件的名字
-*
-?
-[abc] a b c某一个字符
-[^abc] 除了a b c的某一个字符
-[0-9]
----------------------------------------------------------------
-正则表达式 对文件内容
----------------------------------------------------------------
-nano = 构建文件   cat -E = 在每行结束时加个$  tac = cat反过来
-rev = 可以直接手写，得出反过来的
-more/less = 文件内容的部分展示
-head = 前十行
-cat -n passwd |head -3 = 带有行号的前三行（管道组合命令）
-例：要12个数字字母下划线，其他的不要
-cat /dev/urandom |tr -dc 'a-zA-Z0-9_' |head -c12
-tr命令意为translate替换 -dc=-d删除 -c取反
+---------------------------------------------------------------  
+glob 通配符 对文件的名字  
+*  
+?  
+[abc] a b c某一个字符  
+[^abc] 除了a b c的某一个字符  
+[0-9]  
+---------------------------------------------------------------  
+正则表达式 对文件内容  
+---------------------------------------------------------------  
+nano = 构建文件   cat -E = 在每行结束时加个$  tac = cat反过来  
+rev = 可以直接手写，得出反过来的  
+more/less = 文件内容的部分展示  
+head = 前十行  
+cat -n passwd |head -3 = 带有行号的前三行（管道组合命令）  
+例：要12个数字字母下划线，其他的不要  
+cat /dev/urandom |tr -dc 'a-zA-Z0-9_' |head -c12  
+tr命令意为translate替换 -dc=-d删除 -c取反  
 
-tail -n 3 文件名 = tail -n 行数 文件名
-查看文件的倒数3行内容，常用于观察log日志文件，同样可以用管道
-tail -f -n 3 文件名                                                                        tail -F -n 3 文件名
-查看实时刷新的文件的倒数3行内容(文件被删除再恢复后无法监测，跟踪的是文件描述符)        查看实时刷新的文件的倒数3行内容(文件被删除再恢复后可以监测，跟踪的是文件名字)面试常问
+tail -n 3 文件名 = tail -n 行数 文件名  
+查看文件的倒数3行内容，常用于观察log日志文件，同样可以用管道  
+tail -f -n 3 文件名                                                                        tail -F -n 3 文件名  
+查看实时刷新的文件的倒数3行内容(文件被删除再恢复后无法监测，跟踪的是文件描述符)        查看实时刷新的文件的倒数3行内容(文件被删除再恢复后可以监测，跟踪的是文件名字)面试常问  
 
-cut -d分隔符 -f列,列 /etc/passwd
-cut -d: -f1,3 /etc/passwd                             cut -d: -f1,3,5-7 /etc/passwd
-抽取以冒号作为分隔符分割出来的第一列和第三列    分割出来的第一列和第三列和第五到七列
-例：抽取分区利用率
-df |cut -c44-46    44-46是因为df出来的列表中，到利用率的第一个数字是43列，从44列开始是利用率第一位数，45列是第二位数，46列是第三位数，因此取的时候就是取这三列
-例：把df中的空格分割换成冒号分割再取不带%的利用率
-df |tr -s ' ' :|cut -d% -f5
--s指的是压缩，不压缩的话会将连续空格替换成连续冒号，这里其实已经把原来的列重新按新的分隔符分割了
--f5指的是压缩分割以后，利用率是第5列
+cut -d分隔符 -f列,列 /etc/passwd  
+cut -d: -f1,3 /etc/passwd                      cut -d: -f1,3,5-7 /etc/passwd  
+抽取以冒号作为分隔符分割出来的第一列和第三列    分割出来的第一列和第三列和第五到七列  
+例：抽取分区利用率  
+df |cut -c44-46    44-46是因为df出来的列表中，到利用率的第一个数字是43列，从44列开始是利用率第一位数，45列是第二位数，46列是第三位数，因此取的时候就是取这三列  
+例：把df中的空格分割换成冒号分割再取不带%的利用率  
+df |tr -s ' ' :|cut -d% -f5  
+-s指的是压缩，不压缩的话会将连续空格替换成连续冒号，这里其实已经把原来的列重新按新的分隔符分割了  
+-f5指的是压缩分割以后，利用率是第5列  
 
 例：把本机的IP取出来----属于通用命令，可以作为备用脚本用(centos6和7对于ifconfig eth0是不一样的，我们要考虑好版本)
 centos7=ifconfig eth0 |head -2 |tail -1 |tr -s ' ' |cut -d' ' -f3
