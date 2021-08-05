@@ -304,14 +304,14 @@ P28
 引擎：PCRE(是一个Perl库,包括 perl 兼容的正则表达式库)  
 字符匹配、匹配次数、位置锚定、分组  |  帮助指令man 7 regex  
 一、字符匹配  
-. 匹配任意单一字符   grep "r..t" /etc/passwd  —> 以r开头t结尾的单词被过滤  
+\. 匹配任意单一字符   grep "r..t" /etc/passwd  —> 以r开头t结尾的单词被过滤  
 [] 匹配内容中指定范围内的任意单一字符  
 ifconfig eth0 |grep netmask |grep '[[:digit:].]'    —>过滤ip信息中的ip地址  
 '[[:digit:].]' = 变量用单引号识别，[:digit:].是数字和小数点,等价于[0-9.]  
 参数：[^a]=指定范围内除了a字符以外的任意单一字符  
 
 二、匹配次数  
-* 匹配任意次，包括0次，这种遇到符合条件的会一直匹配俗称贪婪模式  
+\* 匹配任意次，包括0次，这种遇到符合条件的会一直匹配俗称贪婪模式  
 ```
 cat > f1
 goooogle
@@ -324,9 +324,9 @@ grep "gooo*gle" f1   —>返回goooogle、google
 例：grep "g.*gle" f1   任意字符任意匹配  
 \\? 匹配前面的字符0或1次  
 例：grep "go\?gle" f1  —>返回gogle、ggle  
-\+ 匹配前面的字符至少1次  
+\\+ 匹配前面的字符至少1次  
 例：grep "go\+gle" f1  —>返回goooogle、google、gogle  
-\{x\} 匹配前面的字符精确次数  
+\\{x\} 匹配前面的字符精确次数  
 例：grep "go\{4\}gle" f1   —>返回goooogle  
 例：grep "go\{2,4\}gle" f1   —>返回goooogle、google  
 例：grep "go\{2,\}gle" f1   —>返回2个以上，上不封顶  
@@ -343,8 +343,8 @@ grep "^gogle$" /etc/passwd  仅返回gogle
 非空的行：grep -v "^$" /etc/passwd    ^$=空行(回车行)  -v反选  "^[[:space:]]*$" = 空白行  
 例：查df硬件利用率行  
 df |grep "^/dev/sd"  
-\< 或 \b 词首锚定，用于单词模式的最左侧  grep "\<root" /etc/passwd  
-\> 或 \b 词尾锚定，用于单词模式的最右侧  grep "root\>" /etc/passwd  
+\\< 或 \b 词首锚定，用于单词模式的最左侧  grep "\<root" /etc/passwd  
+\\> 或 \b 词尾锚定，用于单词模式的最右侧  grep "root\>" /etc/passwd  
 完整单词：grep "\<root\>" /etc/passwd  
 只匹配root完整单词：grep -o "\broot\b"   -o=只匹配字符串参数  
 
@@ -358,8 +358,8 @@ abc
 grep "\(abc\)\{3\}" f1  (abc)作为一个整体匹配过滤三次，返回abcabcabc
 ```
 2.参数：  
-\1  从第一个左括号以及与它搭档的右括号之间匹配的字符;  
-\2  从第二个左括号以及与它搭档的右括号之间匹配的字符  
+\\1  从第一个左括号以及与它搭档的右括号之间匹配的字符;  
+\\2  从第二个左括号以及与它搭档的右括号之间匹配的字符  
 不匹配模式本身，只匹配字符！  
 例：匹配abc之后还有abc的行  
 ```
