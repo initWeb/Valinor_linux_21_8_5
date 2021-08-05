@@ -28,7 +28,8 @@ grep -e root -e wang /etc/passwd
 例：显示多个字符串的交集行  
 grep root /etc/passwd |grep wang  
 例：读取文件中的字符串，与之匹配并打印出行  
-```cat > xxx.txt  
+```
+cat > xxx.txt  
 *****xxx.txt*****  
 root  
 ctrl+c  
