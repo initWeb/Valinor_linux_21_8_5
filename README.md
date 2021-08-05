@@ -70,71 +70,72 @@ df |tr -s ' ' :|cut -d% -f5
 -s指的是压缩，不压缩的话会将连续空格替换成连续冒号，这里其实已经把原来的列重新按新的分隔符分割了  
 -f5指的是压缩分割以后，利用率是第5列  
 
-例：把本机的IP取出来----属于通用命令，可以作为备用脚本用(centos6和7对于ifconfig eth0是不一样的，我们要考虑好版本)
-centos7=ifconfig eth0 |head -2 |tail -1 |tr -s ' ' |cut -d' ' -f3
-centos6=ifconfig eth0 |head -2 |tail -1 |tr -s ' ' : |cut -d: -f2 |tr -dc '[0-9].'
-centos5/6=ifconfig eth0 |head -2 |tail -1 |tr -dc '[0-9].' |tr -s ' ' |cut -d' ' -f2
-tr -dc '[0-9].'=删除0-9和小数点以外的所有，因为centos6后有多余的
-------------------指定输出内容的分隔符------------------
-cut -d: -f1,3 /etc/password         这个是输入:输出用:
-cut -d: -f1,3 --output-delimiter=+ /etc/password         这个是输入:输出用+
+例：把本机的IP取出来----属于通用命令，可以作为备用脚本用(centos6和7对于ifconfig eth0是不一样的，我们要考虑好版本)  
+centos7=ifconfig eth0 |head -2 |tail -1 |tr -s ' ' |cut -d' ' -f3  
+centos6=ifconfig eth0 |head -2 |tail -1 |tr -s ' ' : |cut -d: -f2 |tr -dc '[0-9].'  
+centos5/6=ifconfig eth0 |head -2 |tail -1 |tr -dc '[0-9].' |tr -s ' ' |cut -d' ' -f2  
+tr -dc '[0-9].'=删除0-9和小数点以外的所有，因为centos6后有多余的  
+------------------指定输出内容的分隔符------------------  
+cut -d: -f1,3 /etc/password         这个是输入:输出用:  
+cut -d: -f1,3 --output-delimiter=+ /etc/password         这个是输入:输出用+  
 
-纵向合并cat xx.cfg xxx.cfg
-横向合并paste xx.cfg xxx.cfg
+纵向合并cat xx.cfg xxx.cfg  
+横向合并paste xx.cfg xxx.cfg  
 例：
-seq 1 10 > xxx1.cfg     按顺序输出1-10替换到xxx1.cfg
-cat xxx.cfg
-echo {a..k}|tr ' ' "\n" > xxx2.cfg     将a-k以换行的形式替换到xxx2.cfg
-paste -d":" xxx1.cfg xxx2.cfg     以:分隔横向合并
--d"分隔符" 文件名1 文件名2
-paste -s xxx1.cfg xxx2.cfg
--s显示在一行(默认为多个空格为分隔符)
+seq 1 10 > xxx1.cfg     按顺序输出1-10替换到xxx1.cfg  
+cat xxx.cfg  
+echo {a..k}|tr ' ' "\n" > xxx2.cfg     将a-k以换行的形式替换到xxx2.cfg  
+paste -d":" xxx1.cfg xxx2.cfg     以:分隔横向合并  
+-d"分隔符" 文件名1 文件名2  
+paste -s xxx1.cfg xxx2.cfg  
+-s显示在一行(默认为多个空格为分隔符)  
 
----------------------------分析统计工具(wc)---------------------------
-wc xxx1.cfg
-行数 单词数 字节数 文件名
--l=行数  -w=单词数  -c=字节数   -m=字符总数   -L=显示最长行长度
-wc -L xxx1.cfg
-例：统计连接数
-echo 'ss -tn |wc -l'-1|bc
-echo 'xxxxx'-1|bc
-将统计的行数通过运算传回来，这个直接统计有一个标题，所以减一
-例：把连接的ip取出来
-ss -tn |tr -s ' ' : |cut -d: f6 |tr -d '[[:alpha:]]'      [[:alpha:]]=英文字母
-ss -tn |tr -dc '0-9 .\n:' |tr -s " " : |cut -d: -f6
-例：把一个文件里的单词全部提取出来
-cat /etc/profile |tr -sc 'a-zA-Z' '\n' |wc -l
-tr -sc 'a-zA-Z' '\n'压缩，除了字母以外，都替换成\n换行
+---------------------------分析统计工具(wc)---------------------------  
+wc xxx1.cfg  
+行数 | 单词数 | 字节数 | 文件名 | 最长行
+-l=行数 | -w=单词数 | -c=字节数 | -m=字符总数 | -L=显示最长行长度
+wc -L xxx1.cfg  
+例：统计连接数  
+echo 'ss -tn |wc -l'-1|bc  
+echo 'xxxxx'-1|bc  
+将统计的行数通过运算传回来，这个直接统计有一个标题，所以减一  
+例：把连接的ip取出来  
+ss -tn |tr -s ' ' : |cut -d: f6 |tr -d '[[:alpha:]]'      [[:alpha:]]=英文字母  
+ss -tn |tr -dc '0-9 .\n:' |tr -s " " : |cut -d: -f6  
+例：把一个文件里的单词全部提取出来  
+cat /etc/profile |tr -sc 'a-zA-Z' '\n' |wc -l  
+tr -sc 'a-zA-Z' '\n'压缩，除了字母以外，都替换成\n换行  
 
-----------------------分析统计工具(sort)---------------------
-sort [参数] 文件名     文本排序
-sort -t: -k3 -n /etc/passwd    用:作为分隔符对第3列进行数字正向排序
-sort -t: -k3 -nr /etc/passwd
--r  倒序排序
--u 唯一，重复项合并
--R Random随机排序
-例：取某个分区利用率大于80
-df |tr -s ' ' % |cut -d% -f5|sort -nr |head -n1
-df |tr -s ' ' % |cut -d% -f5|sort -n |tail -n1
-例：统计log有哪些ip访问
-cut -d " " -f1 /var/log/httpd/access_log |sort -u |wc -l
-例：将远程连接的ip取出来统计
-ss -tn |tr -s ' ' : |cut -d: -f6 |sort -u |tr -d '[[:alpha:]]' |wc -l
+----------------------分析统计工具(sort)---------------------  
+sort [参数] 文件名  文本排序  
+sort -t: -k3 -n /etc/passwd    用:作为分隔符对第3列进行数字正向排序  
+sort -t: -k3 -nr /etc/passwd  
+-r  倒序排序  
+-u 唯一，重复项合并  
+-R Random随机排序  
+例：取某个分区利用率大于80  
+df |tr -s ' ' % |cut -d% -f5|sort -nr |head -n1  
+df |tr -s ' ' % |cut -d% -f5|sort -n |tail -n1  
+例：统计log有哪些ip访问  
+cut -d " " -f1 /var/log/httpd/access_log |sort -u |wc -l  
+例：将远程连接的ip取出来统计  
+ss -tn |tr -s ' ' : |cut -d: -f6 |sort -u |tr -d '[[:alpha:]]' |wc -l  
 
-----------------------分析统计工具(uniq)---------------------
-删除文件中相邻上下行的重复内容
-例：查看log中前十个访问最多的ip访问连接了多少次(面试题)
-cut -d " " -f1 /var/log/httpd/access_log |sort |uniq -c |sort -nr |head
-因为这个日志中的ip不全是相邻上下行，所以用sort先排序，保证上下行是一样的
--c=显示重复的次数
-例：查看访问最多的客户端ip访问连接了多少次
-ss -tn |tr -s ' ' : |cut -d: -f6 |sort |uniq -c |sort -nr |head
-例：取出两个文件内容的[交集][不一样的][并集](面试题)
-cat xxx1.cfg xxx2.cfg |sort |uniq -d
-cat xxx1.cfg xxx2.cfg |sort |uniq -u
-cat xxx1.cfg xxx2.cfg |sort -u
+----------------------分析统计工具(uniq)---------------------  
+删除文件中相邻上下行的重复内容  
+例：查看log中前十个访问最多的ip访问连接了多少次(面试题)  
+cut -d " " -f1 /var/log/httpd/access_log |sort |uniq -c |sort -nr |head  
+因为这个日志中的ip不全是相邻上下行，所以用sort先排序，保证上下行是一样的  
+-c=显示重复的次数  
+例：查看访问最多的客户端ip访问连接了多少次  
+ss -tn |tr -s ' ' : |cut -d: -f6 |sort |uniq -c |sort -nr |head  
+例：取出两个文件内容的[交集][不一样的][并集](面试题)  
+cat xxx1.cfg xxx2.cfg |sort |uniq -d  
+cat xxx1.cfg xxx2.cfg |sort |uniq -u  
+cat xxx1.cfg xxx2.cfg |sort -u  
 
-----------------------比较工具(diff)---------------------
+----------------------比较工具(diff)---------------------  
+```
 cat f1
 aaa
 bbb
@@ -155,10 +156,11 @@ diff -u f1 f2     -u=显示详情
 +eee
   ccc
 ****************输出*****************
-实际上我们可以通过指令对文件做备份，误删可以用备份来还原
-diff -u f1 f2 > diff.log
-rm -f f2
-patch -b f1 diff.log   // 指的是将diff.log中的f2还原并命名为f1，原来的f1备份并改名为f1_orig；-b=backup
+```
+实际上我们可以通过指令对文件做备份，误删可以用备份来还原  
+diff -u f1 f2 > diff.log  
+rm -f f2  
+patch -b f1 diff.log   // 指的是将diff.log中的f2还原并命名为f1，原来的f1备份并改名为f1_orig；-b=backup  
 
 
 
@@ -296,67 +298,71 @@ P28
 
 
 
-----------%%基本正则表达式%%----------
-基本正则表达式：BRE
-扩展正则表达式：ERE
-                          grep -E, egrep
-引擎：PCRE(是一个Perl库,包括 perl 兼容的正则表达式库)
-字符匹配、匹配次数、位置锚定、分组  |  帮助指令man 7 regex
-一、字符匹配
-. 匹配任意单一字符   grep "r..t" /etc/passwd  —> 以r开头t结尾的单词被过滤
-[] 匹配内容中指定范围内的任意单一字符
-ifconfig eth0 |grep netmask |grep '[[:digit:].]'    —>过滤ip信息中的ip地址
-'[[:digit:].]' = 变量用单引号识别，[:digit:].是数字和小数点,等价于[0-9.]
-参数：[^a]=指定范围内除了a字符以外的任意单一字符
+----------%%基本正则表达式%%----------  
+基本正则表达式：BRE  
+扩展正则表达式：ERE  grep -E, egrep  
+引擎：PCRE(是一个Perl库,包括 perl 兼容的正则表达式库)  
+字符匹配、匹配次数、位置锚定、分组  |  帮助指令man 7 regex  
+一、字符匹配  
+. 匹配任意单一字符   grep "r..t" /etc/passwd  —> 以r开头t结尾的单词被过滤  
+[] 匹配内容中指定范围内的任意单一字符  
+ifconfig eth0 |grep netmask |grep '[[:digit:].]'    —>过滤ip信息中的ip地址  
+'[[:digit:].]' = 变量用单引号识别，[:digit:].是数字和小数点,等价于[0-9.]  
+参数：[^a]=指定范围内除了a字符以外的任意单一字符  
 
-二、匹配次数
-* 匹配任意次，包括0次，这种遇到符合条件的会一直匹配俗称贪婪模式
+二、匹配次数  
+* 匹配任意次，包括0次，这种遇到符合条件的会一直匹配俗称贪婪模式  
+```
 cat > f1
 goooogle
 google
 gogle
 ggle
-例：查两个o以上，过滤goo，因为o*可以是0次
-grep "gooo*gle" f1   —>返回goooogle、google
-例：grep "g.*gle" f1   任意字符任意匹配
-\? 匹配前面的字符0或1次
-例：grep "go\?gle" f1  —>返回gogle、ggle
-\+ 匹配前面的字符至少1次
-例：grep "go\+gle" f1  —>返回goooogle、google、gogle
-\{x\} 匹配前面的字符精确次数
-例：grep "go\{4\}gle" f1   —>返回goooogle
-例：grep "go\{2,4\}gle" f1   —>返回goooogle、google
-例：grep "go\{2,\}gle" f1   —>返回2个以上，上不封顶
-例：grep "go\{,4\}gle" f1   —>返回4个以下，下不设限
-例：将ifconfig的ip地址过滤出来
-ifconfig eth0 |grep "[0-9]\{1,3\}\.[0-9]\{1,3\}\.[0-9]\{1,3\}\.[0-9]\{1,3\}"
-返回192.168.xx.x、255.255.255.0、192.168.xx.x
-[0-9]\{1,3\}. = 0-9的数字匹配三次后有小数点，相当于三位数带小数点；上面\.是因为只输入.会被认为是匹配任意单一字符，用\转义被认为就是点
+```
+例：查两个o以上，过滤goo，因为o*可以是0次  
+grep "gooo*gle" f1   —>返回goooogle、google  
+例：grep "g.*gle" f1   任意字符任意匹配  
+\? 匹配前面的字符0或1次  
+例：grep "go\?gle" f1  —>返回gogle、ggle  
+\+ 匹配前面的字符至少1次  
+例：grep "go\+gle" f1  —>返回goooogle、google、gogle  
+\{x\} 匹配前面的字符精确次数  
+例：grep "go\{4\}gle" f1   —>返回goooogle  
+例：grep "go\{2,4\}gle" f1   —>返回goooogle、google  
+例：grep "go\{2,\}gle" f1   —>返回2个以上，上不封顶  
+例：grep "go\{,4\}gle" f1   —>返回4个以下，下不设限  
+例：将ifconfig的ip地址过滤出来  
+ifconfig eth0 |grep "[0-9]\{1,3\}\.[0-9]\{1,3\}\.[0-9]\{1,3\}\.[0-9]\{1,3\}"  
+返回192.168.xx.x、255.255.255.0、192.168.xx.x  
+[0-9]\{1,3\}. = 0-9的数字匹配三次后有小数点，相当于三位数带小数点；上面\.是因为只输入.会被认为是匹配任意单一字符，用\转义被认为就是点  
 
-三、位置锚定
-^ 行首锚定，用于模式的最左侧  grep "^root" /etc/passwd
-$ 行尾锚定，用于模式的最右侧  grep "bash$" /etc/passwd
-grep "^gogle$" /etc/passwd  仅返回gogle
-非空的行：grep -v "^$" /etc/passwd    ^$=空行(回车行)  -v反选  "^[[:space:]]*$" = 空白行
-例：查df硬件利用率行
-df |grep "^/dev/sd"
-\< 或 \b 词首锚定，用于单词模式的最左侧  grep "\<root" /etc/passwd
-\> 或 \b 词尾锚定，用于单词模式的最右侧  grep "root\>" /etc/passwd
-完整单词：grep "\<root\>" /etc/passwd
-只匹配root完整单词：grep -o "\broot\b"   -o=只匹配字符串参数
+三、位置锚定  
+^ 行首锚定，用于模式的最左侧  grep "^root" /etc/passwd  
+$ 行尾锚定，用于模式的最右侧  grep "bash$" /etc/passwd  
+grep "^gogle$" /etc/passwd  仅返回gogle  
+非空的行：grep -v "^$" /etc/passwd    ^$=空行(回车行)  -v反选  "^[[:space:]]*$" = 空白行  
+例：查df硬件利用率行  
+df |grep "^/dev/sd"  
+\< 或 \b 词首锚定，用于单词模式的最左侧  grep "\<root" /etc/passwd  
+\> 或 \b 词尾锚定，用于单词模式的最右侧  grep "root\>" /etc/passwd  
+完整单词：grep "\<root\>" /etc/passwd  
+只匹配root完整单词：grep -o "\broot\b"   -o=只匹配字符串参数  
 
-四、分组
-1.语法：\(root\) root为匹配字符串
+四、分组  
+1.语法：\(root\) root为匹配字符串  
+```
 cat > f1
 abcabc
 abcabcabc
 abc
 grep "\(abc\)\{3\}" f1  (abc)作为一个整体匹配过滤三次，返回abcabcabc
-2.参数：
-\1  从第一个左括号以及与它搭档的右括号之间匹配的字符;
-\2  从第二个左括号以及与它搭档的右括号之间匹配的字符
-不匹配模式本身，只匹配字符！
-例：匹配abc之后还有abc的行
+```
+2.参数：  
+\1  从第一个左括号以及与它搭档的右括号之间匹配的字符;  
+\2  从第二个左括号以及与它搭档的右括号之间匹配的字符  
+不匹配模式本身，只匹配字符！  
+例：匹配abc之后还有abc的行  
+```
 cat > f1
 abcabc
 abcabcabc
@@ -366,13 +372,16 @@ abc abc
 abc
 cat f1 |grep "\(abc\).*\1"  f1   返回abcabc、abcabcabc、abc abc
 \1=abc
-例：匹配2个字符串循环的行
+```
+例：匹配2个字符串循环的行  
+```
 cat > f1
 xyz xyz
 abc xyz abc xyz
 cat f1 |grep "\(abc\).*\(xyz\).*\2"   \2=xyz，返回abc xyz abc xyz
-例：匹配模式还是匹配字符？
-cat > f1
+```
+例：匹配模式还是匹配字符？  
+```cat > f1
 123ab123xxy123
 234xxx567
 cat f1|grep "\([0-9]\)\{3\}.*\1"   返回123ab123xxy123
@@ -382,58 +391,57 @@ cat f1|grep "\([0-9]\)\{3\}.*\1"   返回123ab123xxy123
 语法：\|
 grep "^a\|b" /etc/passwd   过滤以a开头或有b的行
 grep "^\(a\|b\)" /etc/passwd  过滤以a或b开头的行
+```
+练习题-----  
+取ifconfig的ip-----ifconfig |grep -o "\([0-9]\{1,3\}\.\)\{3\}[0-9]\{1,3\}" |head -1  
+显示/proc/meminfo中以大小s开头的行（两种方法）  
+显示/etc/passwd中不以/bin/bash结尾的行  
+显示用户rpc默认的shell程序  
+找出/etc/passwd中的两位或三位数  
+显示centos7的/etc/grub2.cfg中，至少以一个空白字符开头且后面有非空白字符的行  
+找出 "netstat -tan" 中以LISTEN后跟任意多个空白字符结尾的行  
+显示centos7所有用户名和uid  
+添加用户bash、testbash、basher、sh、nologin(shell为/sbin/nologin)，找出/etc/passwd用户名和shell同名的行  
+利用df和grep，取出磁盘分区利用率，从大到小排序  
+在文件中用正则过滤出qq号、身份证号、手机号、邮箱  
+----------%%扩展正则表达式%%----------  
+egrep = grep -E  
+egrep [options] pattern [file...]  
+字符匹配：.任意单个字符、[]指定范围单一字符、[^]指定范围以外单一字符  
+次数匹配：* 匹配前面字符任意次  
+	? 匹配前面字符0次或1次  
+	+ 匹配前面字符1次或多次  
+	{m} 匹配前面字符m次  
+	{m,n} 匹配前面字符至少m次，至多n次  
+位置锚定：^ 行首  
+	  $ 行尾  
+	  \< , \b 词首  
+	  \> , \b 词尾  
+分组：() 后向引用：\1 , \2 ...  
+a | b          a或b  
+C | cat       C或cat  
+(C | c)at     Cat或cat  
 
-练习题-----
-取ifconfig的ip-----ifconfig |grep -o "\([0-9]\{1,3\}\.\)\{3\}[0-9]\{1,3\}" |head -1
-显示/proc/meminfo中以大小s开头的行（两种方法）
-显示/etc/passwd中不以/bin/bash结尾的行
-显示用户rpc默认的shell程序
-找出/etc/passwd中的两位或三位数
-显示centos7的/etc/grub2.cfg中，至少以一个空白字符开头且后面有非空白字符的行
-找出 "netstat -tan" 中以LISTEN后跟任意多个空白字符结尾的行
-显示centos7所有用户名和uid
-添加用户bash、testbash、basher、sh、nologin(shell为/sbin/nologin)，找出/etc/passwd用户名和shell同名的行
-利用df和grep，取出磁盘分区利用率，从大到小排序
-在文件中用正则过滤出qq号、身份证号、手机号、邮箱
-----------%%扩展正则表达式%%----------
-egrep = grep -E
-egrep [options] pattern [file...]
-字符匹配：.任意单个字符、[]指定范围单一字符、[^]指定范围以外单一字符
-次数匹配：* 匹配前面字符任意次
-	? 匹配前面字符0次或1次
-	+ 匹配前面字符1次或多次
-	{m} 匹配前面字符m次
-	{m,n} 匹配前面字符至少m次，至多n次
-位置锚定：^ 行首
-	$ 行尾
-	\< , \b 词首
-	\> , \b 词尾
-分组：() 后向引用：\1 , \2 ...
-a | b          a或b
-C | cat       C或cat
-(C | c)at     Cat或cat
+练习题-----  
+1.使用egrep取出 /etc/rc.d/init.d/functions 中其基名和目录名  
+基名指的是文件名的基础名  basename /etc/rc.d/init.d/functions  
+echo "/etc/rc.d/init.d/functions" |grep -Eo "[^/]+$" 返回functions  
+echo "/etc/rc.d/init.d/functions" |grep -o "[^/]\+$"  --基础正则  
+[^/]+$ = 不带/且匹配多次的行尾  
+--目录名(后面的sed可以一次取完)  
+echo "/etc/rc.d/init.d/functions" |grep -Eo ".*[^/]" |grep -Eo ".*/"  
+.*[^/] = 过滤出任意单一字符任意匹配次数且最后不带/  --为什么最后要不带/,是为了规避/etc/rc.d/init.d/这种情况  
+.*/ = 过滤出任意单一字符任意匹配次数且最后带/  
 
-练习题-----
-1.使用egrep取出 /etc/rc.d/init.d/functions 中其基名和目录名
-基名指的是文件名的基础名  basename /etc/rc.d/init.d/functions
-echo "/etc/rc.d/init.d/functions" |grep -Eo "[^/]+$" 返回functions
-echo "/etc/rc.d/init.d/functions" |grep -o "[^/]\+$"  --基础正则
-[^/]+$ = 不带/且匹配多次的行尾
---目录名(后面的sed可以一次取完)
-echo "/etc/rc.d/init.d/functions" |grep -Eo ".*[^/]" |grep -Eo ".*/"
-.*[^/] = 过滤出任意单一字符任意匹配次数且最后不带/  --为什么最后要不带/,是为了规避/etc/rc.d/init.d/这种情况
-.*/ = 过滤出任意单一字符任意匹配次数且最后带/
-
-2.取ifconfig的ip地址
-0-9,10-99 [1-9]?[0-9]
-100-199 1[0-9]{2}
-200-249 2[0-4][0-9]
-250-255 25[0-5]
+2.取ifconfig的ip地址  
+0-9,10-99 [1-9]?[0-9]  
+100-199 1[0-9]{2}  
+200-249 2[0-4][0-9]  
+250-255 25[0-5]  
+```
 ifconfig | grep -Eo "(([1-9]?[0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([1-9]?[0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])"   --参数里面的|前后不能加空格
-
-------------%Vim%------------
-
-
+```
+------------%Vim%------------  
 
 
 
@@ -443,15 +451,17 @@ ifconfig | grep -Eo "(([1-9]?[0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([1-9]?[0
 
 
 
----练习题---
-Linux启动过程，NFS原理，RSYNC，RAID0-5区别，LVS模式，MYSQL主从同步，防火墙DNAT，SNAT，备份恢复方案，监控
-把一个目录中大于100k的文件移动到另一个目录下边
-取一个文件的第1到第200行
-遭受木马攻击，每个文件都被打入了一串js字符串，怎么恢复
-有个文件10000多行，提取前5000行，把里面的xxx替换成sss
-写一个脚本批量建立100个用户
-CDN全程，原理
-高级：一个512M的分区，不停写入1K大小的文件，请问可以写多少个文件？描述其限制原因及解决方法
+
+
+---练习题---  
+Linux启动过程，NFS原理，RSYNC，RAID0-5区别，LVS模式，MYSQL主从同步，防火墙DNAT，SNAT，备份恢复方案，监控  
+把一个目录中大于100k的文件移动到另一个目录下边  
+取一个文件的第1到第200行  
+遭受木马攻击，每个文件都被打入了一串js字符串，怎么恢复  
+有个文件10000多行，提取前5000行，把里面的xxx替换成sss  
+写一个脚本批量建立100个用户  
+CDN全程，原理  
+高级：一个512M的分区，不停写入1K大小的文件，请问可以写多少个文件？描述其限制原因及解决方法  
 
 
 
