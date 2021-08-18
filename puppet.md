@@ -55,3 +55,45 @@ ruby install.rb
 mkdir -p /etc/puppet	// 还在puppet目录执行
 cd conf/redhat/*  /etc/puppet/
 cd conf/auth.conf  /etc/puppet/
+
+配置篇
+=============master端=============
+#建立配置文件目录
+mkdir /etc/puppet/manifests -p	// 还在puppet目录执行
+
+#把服务项添加到服务目录，设置自启动
+cp /etc/puppet/server.init  /etc/init.d/puppetmaster
+chmod 755 /etc/init.d/puppetmaster	// 755应用程序可执行权限
+#自启动（可不设置）
+chkconfig --add puppetmaster
+chkconfig --level 35 puppetmaster on
+
+#启动puppet master
+service puppetmaster start
+#查看端口：netstat -lntup
+
+#check 8140端口
+netstat -lnt
+=============agent端=============
+client需要master授权才能通信，需要CA证书才允许链接master
+1.client请求master授权client再去请求，建立通信授权
+puppetd --test --server master.test.com
+
+显示出warning警告是成功的
+2.在master端查看有谁在请求证书puppetca -l
+在master端单独对谁授权证书puppet -s 域名，puppet -s -a 对所有请求授权
+
+
+发送了一个证书，等待client取得证书
+3.在client端再执行一次puppetd --test --server master.test.com
+
+重置CA证书
+client端
+cd /var/lib/puppet
+rm -rf ssl		// 删除所有ssl连接
+master端
+Cd /var/lib/puppet/ssl/ca/signed
+rm -f agent.test.com.pem
+再重新做3步授权步骤
+
+配置管理
